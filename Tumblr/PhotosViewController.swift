@@ -2,23 +2,23 @@
 //  PhotosViewController.swift
 //  Tumblr
 //
-//  Created by William Nguyen on 9/4/18.
-//  Copyright © 2018 William Nguyen. All rights reserved.
+//  Created by Donie Ypon on 9/4/18.
+//  Copyright © 2018 Donie Ypon. All rights reserved.
 //
 
 import UIKit
 import AlamofireImage
 
 class PhotosViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
-    
+
     @IBOutlet weak var tableView: UITableView!
     var refreshControl: UIRefreshControl!
     
     var posts: [[String: Any]] = []
-    //var posts: [NSDictionary] = []
-
-
+    
+    var url: URL!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -31,7 +31,7 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         fetchFeed()
     }
-   
+    
     @objc func didPullToRefresh(_ refreshControl: UIRefreshControl) {
         fetchFeed()
     }
@@ -54,10 +54,10 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
                 self.posts = responseDictionary["posts"] as! [[String: Any]]
                 //Reloads the table view
                 self.tableView.reloadData()
-                }
             }
-            task.resume()
         }
+        task.resume()
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
@@ -74,7 +74,7 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
             let photo = photos[0]
             let originalSize = photo["original_size"] as! [String: Any]
             let urlString = originalSize["url"] as! String
-            let url = URL(string: urlString)
+            url = URL(string: urlString)
             cell.photoImageView.af_setImage(withURL: url!)
         }
         return cell
@@ -84,38 +84,34 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-   // override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        //let vc = segue.destination as! PhotoDetailsViewController
-        //let indexPath = tableView.indexPath(for: sender as! UITableViewCell)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        //let post = posts[(indexPath?.row)!]
-        //let photos = post.value(forKeyPath: "photos") as? [NSDictionary]
-        //let imageUrlString = photos?[0].value(forKeyPath: "original_size.url") as? String
+        let cell = sender as! UITableViewCell
+        let photoDetailVC = segue.destination as! PhotoDetailsViewController
+        let indexPath = tableView.indexPath(for: cell)!
+        photoDetailVC.photo = url
         
-        
-        //vc.photoURL = imageUrlString
-        
-    //}
+    }
     
     
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-
-
-
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
+    
+    
+    
 }
